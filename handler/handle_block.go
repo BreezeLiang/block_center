@@ -1,14 +1,23 @@
 package handler
 
 import (
-	"block_center/db"
+	"block_center/protocol"
+	"block_center/service"
+	"block_center/util"
+	"github.com/gin-gonic/gin"
+	"log"
 )
 
-func GetBlockFlow(flowId string) (blockFlow db.BlockFlow, err error){
-	blockFlow, err = db.GetBlockFlowByFlowID(flowId)
+func GetBlockFlow(c *gin.Context) {
+	reqParam := protocol.FlowRequestParam{}
+
+	err := c.ShouldBindJSON(&reqParam)
 	if err != nil {
-		return blockFlow, err
+		log.Printf(`GetBlockFlow parse param err: %v`, err)
+		return
 	}
 
-	return blockFlow, nil
+	code, msg, data := service.GetBlockFlow(reqParam.FlowID)
+	util.DoResponse(code, msg, data, c)
+	return
 }

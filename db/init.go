@@ -1,6 +1,7 @@
 package db
 
 import (
+	"block_center/config"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -15,9 +16,10 @@ var (
 )
 
 func InitSqlx() {
-	db, err := sqlx.Open("mysql", "root"+":"+"smmdb2016"+"@tcp("+"182.254.211.181"+":"+"3306"+")/"+"flow")
+	flowDbConf := config.GConfig.DBS[0].Conf
+	db, err := sqlx.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", flowDbConf.UserName, flowDbConf.Password,flowDbConf.Host,flowDbConf.Port, flowDbConf.Name))
 	if err != nil {
-		log.Panic(fmt.Sprintf("mysql session 启动失败: %v\n堆栈信息: %v", err, string(debug.Stack())))
+		log.Fatal(fmt.Sprintf("mysql session 启动失败: %v\n堆栈信息: %v", err, string(debug.Stack())))
 		return
 	}
 	err = db.Ping()
